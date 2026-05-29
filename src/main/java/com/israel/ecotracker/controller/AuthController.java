@@ -8,6 +8,9 @@ import com.israel.ecotracker.service.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.israel.ecotracker.service.PasswordResetService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
@@ -15,6 +18,9 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
+
+    @Autowired
+    private PasswordResetService passwordResetService;
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
@@ -61,5 +67,23 @@ public class AuthController {
 
         String token = jwtService.generateToken(user.getId(), user.getEmail());
         return ResponseEntity.ok(new AuthResponse(token, user.getId(), user.getName()));
+    }
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        passwordResetService.requestPasswordReset(email);
+        return ResponseEntity.ok("If that email exists, a reset code has been sent.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+        boolean isSuccess = passwordResetService.verifyAndResetPassword(token, newPassword);
+
+        if (isSuccess) {
+            return ResponseEntity.ok("Password successfully updated. You can now log in.");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid or expired reset code.");
+        }
     }
 }

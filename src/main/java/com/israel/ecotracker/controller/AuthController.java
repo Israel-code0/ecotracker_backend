@@ -98,13 +98,20 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("message", "Reset email sent successfully"));
         } catch (Exception e) {
             System.out.println("!!! CRITICAL MAIL SYSTEM EXCEPTION !!!");
-            e.printStackTrace(); // This prints the EXACT connection failure details to your Render logs
+            e.printStackTrace();
             return ResponseEntity.status(500).body(Map.of("error", "Mail server failed: " + e.getMessage()));
         }
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        String token = body.get("token");
+        String newPassword = body.get("newPassword");
+
+        if (token == null || newPassword == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Token and new password are required."));
+        }
+
         boolean isSuccess = passwordResetService.verifyAndResetPassword(token, newPassword);
 
         if (isSuccess) {

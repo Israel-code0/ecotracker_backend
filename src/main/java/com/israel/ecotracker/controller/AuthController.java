@@ -1,18 +1,24 @@
 package com.israel.ecotracker.controller;
 
+import com.israel.ecotracker.domain.OtpToken;
 import com.israel.ecotracker.domain.User;
 import com.israel.ecotracker.dto.auth.AuthResponse;
 import com.israel.ecotracker.dto.auth.SignupRequest;
+import com.israel.ecotracker.repository.OtpTokenRepository;
 import com.israel.ecotracker.repository.UserRepository;
+import com.israel.ecotracker.service.EmailService;
 import com.israel.ecotracker.service.JwtService;
+import com.israel.ecotracker.service.PasswordResetService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import com.israel.ecotracker.service.PasswordResetService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import jakarta.transaction.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,6 +27,12 @@ public class AuthController {
 
     @Autowired
     private PasswordResetService passwordResetService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private OtpTokenRepository otpTokenRepository;
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
@@ -69,11 +81,22 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(token, user.getId(), user.getName()));
     }
 
-
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
-        passwordResetService.requestPasswordReset(email);
-        return ResponseEntity.ok("If that email exists, a reset code has been sent.");
+    @Transactional
+    public ResponseEntity<?> requestPasswordReset(@RequestParam String email) {
+        otpTokenRepository.deleteByEmail(email);
+
+        String otp = String.format("%06d", new Random().nextInt(999999));
+
+        OtpToken token = new OtpToken(email, otp, LocalDateTime.now().plusMinutes(10));
+        otpTokenRepository.save(token);
+
+        try {
+            emailService.sendOtpEmail(email, otp);
+            return ResponseEntity.ok("Reset email sent successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to send email: " + e.getMessage());
+        }
     }
 
     @PostMapping("/reset-password")

@@ -46,10 +46,9 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email is already registered!");
+            return ResponseEntity.badRequest().body(Map.of("error", "Email is already registered!"));
         }
 
-        // Encrypt password before saving to MySQL
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
         User newUser = new User(
@@ -70,11 +69,10 @@ public class AuthController {
         String email = body.get("email");
         String password = body.get("password");
 
-        User user = userRepository.findByEmail(email)
-                .orElse(null);
+        User user = userRepository.findByEmail(email).orElse(null);
 
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            return ResponseEntity.status(401).body("Invalid email address or password.");
+            return ResponseEntity.status(401).body(Map.of("error", "Invalid email address or password."));
         }
 
         String token = jwtService.generateToken(user.getId(), user.getEmail());
@@ -92,10 +90,16 @@ public class AuthController {
         otpTokenRepository.save(token);
 
         try {
+            System.out.println("SMTP Diagnostics: Attempting connection to Google Mail server for: " + email);
             emailService.sendOtpEmail(email, otp);
-            return ResponseEntity.ok(java.util.Map.of("message", "Reset email sent successfully"));
+            System.out.println("SMTP Diagnostics: Mail dispatched successfully!");
+
+            // Returns clean JSON so Flutter's Dio doesn't crash on response parsing
+            return ResponseEntity.ok(Map.of("message", "Reset email sent successfully"));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Failed to send email: " + e.getMessage());
+            System.out.println("!!! CRITICAL MAIL SYSTEM EXCEPTION !!!");
+            e.printStackTrace(); // This prints the EXACT connection failure details to your Render logs
+            return ResponseEntity.status(500).body(Map.of("error", "Mail server failed: " + e.getMessage()));
         }
     }
 
@@ -104,9 +108,9 @@ public class AuthController {
         boolean isSuccess = passwordResetService.verifyAndResetPassword(token, newPassword);
 
         if (isSuccess) {
-            return ResponseEntity.ok("Password successfully updated. You can now log in.");
+            return ResponseEntity.ok(Map.of("message", "Password successfully updated. You can now log in."));
         } else {
-            return ResponseEntity.badRequest().body("Invalid or expired reset code.");
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid or expired reset code."));
         }
     }
 }

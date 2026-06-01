@@ -93,7 +93,7 @@ public class AuthController {
 
         try {
             emailService.sendOtpEmail(email, otp);
-            return ResponseEntity.ok("Reset email sent successfully");
+            return ResponseEntity.ok(java.util.Map.of("message", "Reset email sent successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to send email: " + e.getMessage());
         }

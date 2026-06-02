@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 @RestController
@@ -118,6 +119,40 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("message", "Password successfully updated. You can now log in."));
         } else {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid or expired reset code."));
+        }
+    }
+
+    @PutMapping("/update-profile")
+    public ResponseEntity<?> updateProfile(@RequestBody Map<String, String> body) {
+        String userId = body.get("userId");
+        String newName = body.get("newName");
+
+        if (userId == null || newName == null || newName.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid user data provided."));
+        }
+
+        try {
+            // FIX 1: Parse the string into a UUID instead of a Long
+            java.util.UUID userUuid = java.util.UUID.fromString(userId);
+            Optional<User> userOptional = userRepository.findById(userUuid);
+
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+
+                // FIX 2: Change this to match your User entity (e.g., setName, setUsername, setFullName)
+                user.setName(newName);
+
+                userRepository.save(user);
+
+                return ResponseEntity.ok(Map.of("message", "Profile updated successfully."));
+            } else {
+                return ResponseEntity.badRequest().body(Map.of("error", "User not found."));
+            }
+        } catch (IllegalArgumentException e) {
+            // Catches cases where the Flutter app sends a badly formatted UUID string
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid user ID format."));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", "Failed to update profile."));
         }
     }
 }

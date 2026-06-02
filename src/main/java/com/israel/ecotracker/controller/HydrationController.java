@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/hydration")
-@CrossOrigin(origins = "*")
 public class HydrationController {
 
     private final HydrationLogRepository hydrationLogRepository;

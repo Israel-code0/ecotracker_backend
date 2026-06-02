@@ -15,7 +15,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/carbon")
-@CrossOrigin(origins = "*") // Allows connection from Flutter Web/Mobile Emulators
 public class CarbonLedgerController {
 
     private final CarbonLedgerService carbonLedgerService;

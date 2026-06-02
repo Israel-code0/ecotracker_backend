@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/greenspace")
-public class GreenSpaceController {
+public class GreenSpaceLogController {
 
 
     private final GreenSpaceLogService greenSpaceLogService;
 
-    public GreenSpaceController(GreenSpaceLogService greenSpaceLogService) {
+    public GreenSpaceLogController(GreenSpaceLogService greenSpaceLogService) {
         this.greenSpaceLogService = greenSpaceLogService;
     }
 

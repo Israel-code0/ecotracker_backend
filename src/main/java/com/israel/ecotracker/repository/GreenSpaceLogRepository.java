@@ -11,5 +11,5 @@ public interface GreenSpaceLogRepository extends JpaRepository<GreenSpaceLog, Lo
 
     // Calculates the lifetime total of mindful minutes for a specific user
     @Query("SELECT COALESCE(SUM(g.minutes), 0) FROM GreenSpaceLog g WHERE g.userId = :userId")
-    int getLifetimeTotalMinutesForUser(@Param("userId") String userId);
+    int sumTotalMinutesByUserId(@Param("userId") String userId);
 }

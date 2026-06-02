@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/badges")
+@CrossOrigin(origins = "*")
 public class BadgeController {
 
     private final EarnedBadgeRepository badgeRepository;

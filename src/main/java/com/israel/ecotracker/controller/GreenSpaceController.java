@@ -11,6 +11,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/greenspace")
+@CrossOrigin(origins = "*")
 public class GreenSpaceController {
 
     private final GreenSpaceLogRepository greenSpaceLogRepository;

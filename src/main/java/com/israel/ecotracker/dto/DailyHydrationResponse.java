@@ -6,7 +6,7 @@ public class DailyHydrationResponse {
     // Default constructor
     public DailyHydrationResponse() {}
 
-    // Constructor with 1 argument (Fixes your "Expected no arguments" error!)
+    // Constructor with 1 argument
     public DailyHydrationResponse(int totalAmount) {
         this.totalAmount = totalAmount;
     }

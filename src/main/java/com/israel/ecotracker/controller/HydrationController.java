@@ -1,40 +1,39 @@
 package com.israel.ecotracker.controller;
 
-import com.israel.ecotracker.domain.HydrationLog;
 import com.israel.ecotracker.dto.DailyHydrationResponse;
-import com.israel.ecotracker.dto.HydrationLogRequest;
-import com.israel.ecotracker.repository.HydrationLogRepository;
+import com.israel.ecotracker.service.HydrationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/hydration")
 public class HydrationController {
 
-    private final HydrationLogRepository hydrationLogRepository;
+    private final HydrationService hydrationService;
 
-    public HydrationController(HydrationLogRepository hydrationLogRepository) {
-        this.hydrationLogRepository = hydrationLogRepository;
+    public HydrationController(HydrationService hydrationService) {
+        this.hydrationService = hydrationService;
     }
 
-    // 1. Save a new water log
     @PostMapping("/log")
-    public ResponseEntity<Void> logWater(@RequestBody HydrationLogRequest request) {
-        HydrationLog log = new HydrationLog(
-                request.getUserId(),
-                request.getAmount(),
-                LocalDate.now()
-        );
+    public ResponseEntity<String> logWater(@RequestBody Map<String, Object> payload) {
+        try {
+            String userId = payload.get("userId").toString();
+            int amount = Integer.parseInt(payload.get("amount").toString());
 
-        hydrationLogRepository.save(log);
-        return ResponseEntity.ok().build();
+            hydrationService.logWater(userId, amount);
+            return ResponseEntity.ok("Water logged successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Invalid hydration data");
+        }
     }
 
-    // 2. Get today's total for the UI
     @GetMapping("/{userId}/today")
     public ResponseEntity<DailyHydrationResponse> getTodayTotal(@PathVariable String userId) {
-        int totalToday = hydrationLogRepository.sumWaterByUserIdAndDate(userId, LocalDate.now());
+
+        int totalToday = hydrationService.getDailyTotal(userId, LocalDate.now());
 
         return ResponseEntity.ok(new DailyHydrationResponse(totalToday));
     }

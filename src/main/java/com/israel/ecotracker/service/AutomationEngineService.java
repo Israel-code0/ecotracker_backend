@@ -1,10 +1,8 @@
 package com.israel.ecotracker.service;
 
 import com.israel.ecotracker.domain.ActivityLog;
-import com.israel.ecotracker.domain.Badge;
 import com.israel.ecotracker.domain.User;
 import com.israel.ecotracker.repository.ActivityLogRepository;
-import com.israel.ecotracker.repository.BadgeRepository;
 import com.israel.ecotracker.repository.UserRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,16 +15,17 @@ import java.util.UUID;
 @Service
 public class AutomationEngineService {
 
-    private final BadgeRepository badgeRepository;
+    // 👇 1. Inject the BadgeService (The Brain) instead of the Repository
+    private final BadgeService badgeService;
     private final ActivityLogRepository activityLogRepository;
     private final UserRepository userRepository;
     private final JavaMailSender mailSender;
 
-    public AutomationEngineService(BadgeRepository badgeRepository,
+    public AutomationEngineService(BadgeService badgeService,
                                    ActivityLogRepository activityLogRepository,
                                    UserRepository userRepository,
                                    JavaMailSender mailSender) {
-        this.badgeRepository = badgeRepository;
+        this.badgeService = badgeService;
         this.activityLogRepository = activityLogRepository;
         this.userRepository = userRepository;
         this.mailSender = mailSender;
@@ -35,21 +34,20 @@ public class AutomationEngineService {
     /**
      * Evaluates and unlocks achievements instantly
      */
-    public List<Badge> evaluateAndAwardBadges(UUID userId) {
+    public void evaluateAndAwardBadges(UUID userId) {
         List<ActivityLog> logs = activityLogRepository.findByUserIdOrderByLoggedAtDesc(userId);
 
-        // Milestone 1: Fresh Start
-        if (!logs.isEmpty() && !badgeRepository.existsByUserIdAndBadgeCode(userId, "FRESH_START")) {
-            badgeRepository.save(new Badge(userId, "FRESH_START", "First Eco Step"));
+        String userIdStr = userId.toString();
+
+        if (!logs.isEmpty()) {
+            badgeService.evaluateAndAwardBadge(userIdStr, "FRESH_START");
         }
 
         // Milestone 2: Power Saver (Logged more than 3 electricity logs and kept average low)
         long electricityCount = logs.stream().filter(l -> l.getCategory().getName().equals("ELECTRICITY")).count();
-        if (electricityCount >= 3 && !badgeRepository.existsByUserIdAndBadgeCode(userId, "POWER_SAVER")) {
-            badgeRepository.save(new Badge(userId, "POWER_SAVER", "Grid Guardian"));
+        if (electricityCount >= 3) {
+            badgeService.evaluateAndAwardBadge(userIdStr, "POWER_SAVER");
         }
-
-        return badgeRepository.findByUserId(userId);
     }
 
     /**

@@ -24,7 +24,14 @@ public class GreenSpaceLog {
     }
 
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
     public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
+
     public int getMinutes() { return minutes; }
+    public void setMinutes(int minutes) { this.minutes = minutes;}
+
     public LocalDate getLogDate() { return logDate; }
+    public void setLogDate(LocalDate logDate) { this.logDate = logDate; }
 }

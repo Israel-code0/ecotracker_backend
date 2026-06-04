@@ -1,9 +1,12 @@
 package com.israel.ecotracker.controller;
 
 import com.israel.ecotracker.domain.ActivityLog;
+import com.israel.ecotracker.domain.EarnedBadge;
 import com.israel.ecotracker.domain.User;
 import com.israel.ecotracker.dto.CarbonSummaryDTO;
 import com.israel.ecotracker.repository.UserRepository;
+import com.israel.ecotracker.service.AutomationEngineService;
+import com.israel.ecotracker.service.BadgeService;
 import com.israel.ecotracker.service.CarbonLedgerService;
 import com.israel.ecotracker.service.InsightsEngineService;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +22,24 @@ public class CarbonLedgerController {
 
     private final CarbonLedgerService carbonLedgerService;
     private final UserRepository userRepository;
-    private final com.israel.ecotracker.service.InsightsEngineService insightsEngineService;
-    private final com.israel.ecotracker.service.AutomationEngineService automationEngineService;
+    private final InsightsEngineService insightsEngineService;
+    private final AutomationEngineService automationEngineService;
+    private final BadgeService badgeService;
 
-    public CarbonLedgerController(CarbonLedgerService carbonLedgerService, UserRepository userRepository, com.israel.ecotracker.service.InsightsEngineService insightsEngineService, com.israel.ecotracker.service.AutomationEngineService automationEngineService) {
+    public CarbonLedgerController(CarbonLedgerService carbonLedgerService,
+                                  UserRepository userRepository,
+                                  InsightsEngineService insightsEngineService,
+                                  AutomationEngineService automationEngineService,
+                                  BadgeService badgeService) {
         this.carbonLedgerService = carbonLedgerService;
         this.userRepository = userRepository;
         this.insightsEngineService = insightsEngineService;
         this.automationEngineService = automationEngineService;
+        this.badgeService = badgeService;
     }
 
     /**
      * POST endpoint to record a new footprint entry.
-     * Expected JSON Body: { "userId": "...", "categoryId": 1, "quantity": 45.5 }
      */
     @PostMapping("/logs")
     public ResponseEntity<ActivityLog> logNewActivity(@RequestBody Map<String, Object> payload) {
@@ -74,7 +82,6 @@ public class CarbonLedgerController {
         }
     }
 
-
     /**
      * GET endpoint fetching dynamically processed actionable insights for a user.
      */
@@ -90,8 +97,15 @@ public class CarbonLedgerController {
         }
     }
 
+    /**
+     * GET endpoint for fetching the user's unlocked achievements.
+     */
     @GetMapping("/badges/{userId}")
-    public ResponseEntity<List<com.israel.ecotracker.domain.Badge>> getUserBadges(@PathVariable UUID userId) {
-        return ResponseEntity.ok(automationEngineService.evaluateAndAwardBadges(userId));
+    public ResponseEntity<List<EarnedBadge>> getUserBadges(@PathVariable UUID userId) {
+        automationEngineService.evaluateAndAwardBadges(userId);
+
+        List<EarnedBadge> unlockedBadges = badgeService.getUserBadges(userId.toString());
+
+        return ResponseEntity.ok(unlockedBadges);
     }
 }

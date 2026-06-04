@@ -28,4 +28,9 @@ public class EarnedBadge {
     public String getUserId() { return userId; }
     public String getBadgeCode() { return badgeCode; }
     public LocalDateTime getEarnedAt() { return earnedAt; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setUserId(String userId) { this.userId = userId; }
+    public void setBadgeCode(String badgeCode) { this.badgeCode = badgeCode; }
+    public void setEarnedAt(LocalDateTime earnedAt) { this.earnedAt = earnedAt; }
 }

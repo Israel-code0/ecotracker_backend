@@ -11,10 +11,11 @@ public class HydrationLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    final private String userId;
-    final private int amount;
-    final private LocalDate logDate;
+    private String userId;
+    private int amount;
+    private LocalDate logDate;
 
+    public HydrationLog() {}
 
     public HydrationLog(String userId, int amount, LocalDate logDate) {
         this.userId = userId;
@@ -22,9 +23,15 @@ public class HydrationLog {
         this.logDate = logDate;
     }
 
-    // Getters and Setters...
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
     public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
+
     public int getAmount() { return amount; }
+    public void setAmount(int amount) { this.amount = amount; }
+
     public LocalDate getLogDate() { return logDate; }
+    public void setLogDate(LocalDate logDate) { this.logDate = logDate; }
 }

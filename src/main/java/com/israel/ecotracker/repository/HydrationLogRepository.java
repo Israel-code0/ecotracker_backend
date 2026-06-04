@@ -10,6 +10,8 @@ import java.time.LocalDate;
 @Repository
 public interface HydrationLogRepository extends JpaRepository<HydrationLog, Long> {
 
-    @Query("SELECT COALESCE(SUM(h.amount), 0) FROM HydrationLog h WHERE h.userId = :userId AND h.logDate = :today")
-    int getTotalHydrationForUserToday(@Param("userId") String userId, @Param("today") LocalDate today);
+    @Query("SELECT SUM(h.amount) FROM HydrationLog h WHERE h.userId = :userId AND h.logDate = :date")
+    Integer sumWaterByUserIdAndDate(@Param("userId") String userId, @Param("date") LocalDate date);
+
+    void deleteByUserIdAndDate(String userId, LocalDate date);
 }

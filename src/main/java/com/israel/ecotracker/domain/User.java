@@ -1,6 +1,7 @@
 package com.israel.ecotracker.domain;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -24,6 +25,12 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "reset_otp")
+    private String resetOtp;
+
+    @Column(name = "otp_expiry_time")
+    private LocalDateTime otpExpiryTime;
+
     public User() {}
 
     public User(String email, String name, Double annualCarbonGoal, String password) {
@@ -33,7 +40,6 @@ public class User {
         this.password = password;
     }
 
-    // Getters and Setters
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
     public String getEmail() { return email; }
@@ -44,4 +50,9 @@ public class User {
     public void setAnnualCarbonGoal(Double annualCarbonGoal) { this.annualCarbonGoal = annualCarbonGoal; }
     public String getPassword() {return password; }
     public void setPassword(String password) {this.password = password; }
+
+    public String getResetOtp() { return resetOtp; }
+    public void setResetOtp(String resetOtp) { this.resetOtp = resetOtp; }
+    public LocalDateTime getOtpExpiryTime() { return otpExpiryTime; }
+    public void setOtpExpiryTime(LocalDateTime otpExpiryTime) { this.otpExpiryTime = otpExpiryTime; }
 }

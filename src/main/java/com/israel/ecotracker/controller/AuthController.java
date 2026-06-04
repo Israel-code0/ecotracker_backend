@@ -105,14 +105,15 @@ public class AuthController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
-        String token = body.get("token");
+        String email = body.get("email");
+        String otp = body.get("otp");
         String newPassword = body.get("newPassword");
 
-        if (token == null || newPassword == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Token and new password are required."));
+        if (email == null || otp == null || newPassword == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email, OTP, and new password are required."));
         }
 
-        boolean isSuccess = passwordResetService.verifyAndResetPassword(token, newPassword);
+        boolean isSuccess = passwordResetService.verifyAndResetPassword(email, otp, newPassword);
 
         if (isSuccess) {
             return ResponseEntity.ok(Map.of("message", "Password successfully updated. You can now log in."));

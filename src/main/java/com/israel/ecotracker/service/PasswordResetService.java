@@ -22,8 +22,8 @@ public class PasswordResetService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Transactional
-    public boolean verifyAndResetPassword(String otpCode, String newPassword) {
-        OtpToken token = otpTokenRepository.findByOtp(otpCode).orElse(null);
+    public boolean verifyAndResetPassword(String email, String otpCode, String newPassword) {
+        OtpToken token = otpTokenRepository.findByEmailAndOtp(email, otpCode).orElse(null);
 
         if (token == null || token.getExpiryDate().isBefore(LocalDateTime.now())) {
             return false;

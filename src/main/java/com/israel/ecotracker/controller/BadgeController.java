@@ -21,7 +21,6 @@ public class BadgeController {
         this.badgeRepository = badgeRepository;
     }
 
-    // 1. Fetch all unlocked badges for the UI
     @GetMapping("/{userId}")
     public ResponseEntity<List<EarnedBadgeResponse>> getUserBadges(@PathVariable String userId) {
         List<EarnedBadgeResponse> badges = badgeRepository.findByUserId(userId)
@@ -32,7 +31,6 @@ public class BadgeController {
         return ResponseEntity.ok(badges);
     }
 
-    // 2. Secret endpoint to award a badge (can be called by other Java services or for testing)
     @PostMapping("/award/{userId}")
     public ResponseEntity<String> awardBadge(@PathVariable String userId, @RequestBody Map<String, String> payload) {
         String badgeCode = payload.get("badgeCode");

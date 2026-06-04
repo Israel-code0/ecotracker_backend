@@ -18,6 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/carbon")
+@CrossOrigin("*")
 public class CarbonLedgerController {
 
     private final CarbonLedgerService carbonLedgerService;

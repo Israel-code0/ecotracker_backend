@@ -13,5 +13,5 @@ public interface HydrationLogRepository extends JpaRepository<HydrationLog, Long
     @Query("SELECT SUM(h.amount) FROM HydrationLog h WHERE h.userId = :userId AND h.logDate = :date")
     Integer sumWaterByUserIdAndDate(@Param("userId") String userId, @Param("date") LocalDate date);
 
-    void deleteByUserIdAndDate(String userId, LocalDate date);
+    void deleteByUserIdAndLogDate(String userId, LocalDate logdate);
 }

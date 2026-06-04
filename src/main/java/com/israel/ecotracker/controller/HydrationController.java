@@ -34,7 +34,7 @@ public class HydrationController {
     // 2. Get today's total for the UI
     @GetMapping("/{userId}/today")
     public ResponseEntity<DailyHydrationResponse> getTodayTotal(@PathVariable String userId) {
-        int totalToday = hydrationLogRepository.getTotalHydrationForUserToday(userId, LocalDate.now());
+        int totalToday = hydrationLogRepository.sumWaterByUserIdAndDate(userId, LocalDate.now());
 
         return ResponseEntity.ok(new DailyHydrationResponse(totalToday));
     }

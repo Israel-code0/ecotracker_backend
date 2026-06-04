@@ -54,6 +54,6 @@ public class HydrationService {
      */
     @Transactional
     public void resetDailyWater(String userId, LocalDate date) {
-        hydrationLogRepository.deleteByUserIdAndDate(userId, date);
+        hydrationLogRepository.deleteByUserIdAndLogDate(userId, date);
     }
 }

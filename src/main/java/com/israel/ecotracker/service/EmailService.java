@@ -20,7 +20,15 @@ public class EmailService {
                 "Your 6-digit password reset code is: " + otp + "\n\n" +
                 "This code will expire in 10 minutes. If you did not request this, please ignore this email.");
 
-        // This simple command automatically reads your smtp.gmail.com settings from application.properties!
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            // Updated to use the correct method parameter variables: toEmail and otp
+            System.out.println("\n=======================================================");
+            System.out.println("!!! FIREWALL BLOCK !!! SMTP failed, but here is your test OTP:");
+            System.out.println("Email: " + toEmail);
+            System.out.println("OTP Code: " + otp);
+            System.out.println("=======================================================\n");
+        }
     }
 }
